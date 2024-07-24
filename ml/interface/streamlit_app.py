@@ -40,7 +40,7 @@ uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 processing_container = st.empty()
 processing_container.text(" ")
 if uploaded_file is not None:
-    temp_filepath = Path("./assets/temp_file.pdf")
+    temp_filepath = Path(".interface/assets/temp_file.pdf")
     with open(temp_filepath, "wb") as f:
         f.write(uploaded_file.read())
     processing_container.text("File uploaded...")

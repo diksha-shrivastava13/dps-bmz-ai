@@ -186,7 +186,7 @@ def recommended_fields_generation(index):
     return recommended_fields_data
 
 
-filepath = "./assets/temp_file.pdf"
+filepath = "temp_file.pdf"
 if uploaded_file is not None:
     # time.sleep(5)
     query_index = create_index(filepath)

@@ -50,7 +50,7 @@ def overview_report(index):
         "and everything it entails. You should cover all the sections of the documents. Make the report as"
         "large and as detailed as possible. Pay special attention to risks, indicators and on generating a"
         "comprehensive report out of all wirkungsmatrix and appendix tables available in the report."
-        "Respond in German."
+        "Respond in German. Don't mention the file name (temp_file.pdf) itself in your report."
     )
     qa_prompt_template = PromptTemplate(program_report_prompt)
     query_engine.update_prompts(

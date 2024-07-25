@@ -79,7 +79,7 @@ def key_value_pairs(index):
         "theme, year, duration, budget and all other information present in the KURZBESCHREIBUNG table."
         "Give the answer in the markdown format. Do NOT enclose this data within ``` ``` markers. If there's"
         "any missing field, you are allowed to use the header of the file and its content to fill it."
-        "Respond in German.")
+        "Respond in German. Given the title as some variance of 'General Overview or General Information'")
     with kv_tab:
         st.markdown(key_value_data)
     return key_value_data

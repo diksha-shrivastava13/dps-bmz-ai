@@ -24,36 +24,9 @@ llm = AzureOpenAI(engine="gpt-4o", model="gpt-4o", temperature=0.0,
 Settings.embed_model = embed_model
 Settings.llm = llm
 
-# Configure Streamlit page layout
-st.set_page_config(
-    page_title="PortFolio Navigator",
-    page_icon=":chart_with_upwards_trend:",
-    layout="wide"
-)
-st.markdown("<h1 style='text-align: center;'>📈 Portfolio Navigator </h1>", unsafe_allow_html=True)
-st.markdown(" ")
-st.markdown("<p style='text-align: center;'>Upload your Document to Portfolio Navigator and get overview, insights, "
-            "history and analysis.", unsafe_allow_html=True)
-
-# Upload functionality
-uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
-processing_container = st.empty()
-processing_container.text(" ")
-if uploaded_file is not None:
-    temp_filepath = Path("temp_file.pdf")
-    with open(temp_filepath, "wb") as f:
-        f.write(uploaded_file.read())
-    processing_container.text("File uploaded...")
-    time.sleep(2)
-    processing_container.text("Processing...")
-
-else:
-    st.markdown("""<p style="color: #3ae2a5;">Please upload a PDF file.</p>""", unsafe_allow_html=True)
-
 
 # File Processing Functions
 def create_index(file_path):
-    processing_container.markdown("""<p style="color: #3ae2a5;">Creating Index...</p>""", unsafe_allow_html=True)
     loader = SimpleDirectoryReader(input_files=[file_path], required_exts=[".pdf"])
     docs = loader.load_data()
     index = VectorStoreIndex.from_documents(docs)
@@ -89,6 +62,8 @@ def overview_report(index):
         "with decision making. You should not miss any important information, you should mention all"
         "the numbers clearly, along with this you should output a very detailed history of the document,"
         "and everything it entails. You should cover all the sections of the documents.")
+    with ov_tab:
+        st.markdown(overview)
     return overview
 
 
@@ -102,6 +77,8 @@ def key_value_pairs(index):
         "about the report in the table. This should necessarily include the title of the report, country, "
         "theme, year, duration, budget and all other information present in the KURZBESCHREIBUNG table."
         "Give the answer in the markdown format. Do NOT enclose this data within ``` ``` markers.")
+    with kv_tab:
+        st.markdown(key_value_data)
     return key_value_data
 
 
@@ -114,6 +91,8 @@ def risk_analysis(index):
         "any recommendations that are provided for these risks in the documents and call to actions. Pay particular "
         "attention on the key indicators mentioned in the report and if there's any risk or anomaly there."
     )
+    with rg_tab:
+        st.markdown(risk_data)
     return risk_data
 
 
@@ -157,6 +136,13 @@ def wirkungsmatrix(file_path):
         "Detail all the information from Karte mit Kennzeichnung der projektregion in english."
     )
     wirkungsdata = [wirkungsdata1, wirkungsdata2, wirkungsdata3, wirkungsdata4, wirkungsdata5, wirkungsdata6]
+    with w_tab:
+        st.markdown(wirkungsdata[0])
+        st.markdown(wirkungsdata[1])
+        st.markdown(wirkungsdata[2])
+        st.markdown(wirkungsdata[3])
+        st.markdown(wirkungsdata[4])
+        st.markdown(wirkungsdata[5])
     return wirkungsdata
 
 
@@ -170,6 +156,8 @@ def next_steps(index):
         "you should also include the assumptions and risks and the actions you think should be taken in order to "
         "make the program a success."
     )
+    with ac_tab:
+        st.markdown(next_steps_data)
     return next_steps_data
 
 
@@ -183,44 +171,98 @@ def recommended_fields_generation(index):
         "useful in order for you to assist in making data driven decisions and always have insights into how the"
         "program is processing and drive it to success."
     )
+    with f_tab:
+        with col1:
+            st.markdown(recommended_fields_data)
     return recommended_fields_data
 
 
-filepath = "temp_file.pdf"
+def user_query_answer(index, user_query):
+    query_engine = index.as_query_engine()
+    query_answer = query_engine.query(user_query + " Make the answer as detailed and as comprehensive as required."
+                                      + " Make sure to use the documents as context to answer the question."
+                                      + " If you cannot find an answer from the documents, tell the user to go through"
+                                        "the original document they uploaded")
+    return query_answer
+
+
+def display_information_once():
+    file_path = "temp_file.pdf"
+    if uploaded_file is not None:
+        # time.sleep(5)
+        processing_container.markdown("""<p style="color: #3ae2a5;">Creating Index...</p>""", unsafe_allow_html=True)
+        query_index_ = create_index(file_path)
+
+        # data
+        overview_report(query_index_)
+        key_value_pairs(query_index_)
+        risk_analysis(query_index_)
+        wirkungsmatrix(file_path)
+        next_steps(query_index_)
+        recommended_fields_generation(query_index_)
+
+        processing_container.markdown("""<p style="color: #3ae2a5;">Processing complete!</p>""", unsafe_allow_html=True)
+
+
+st.set_page_config(
+    page_title="PortFolio Navigator",
+    page_icon=":chart_with_upwards_trend:",
+    layout="wide"
+)
+st.markdown("<h1 style='text-align: center;'>📈 Portfolio Navigator </h1>", unsafe_allow_html=True)
+st.markdown(" ")
+st.markdown(
+    "<p style='text-align: center;'>Upload your Document to Portfolio Navigator and get overview, insights, "
+    "history and analysis.", unsafe_allow_html=True)
+
+# Upload functionality
+uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
+processing_container = st.empty()
+processing_container.text(" ")
+
+# Tab Overview
+ov_tab, kv_tab, rg_tab, w_tab, ac_tab, f_tab = st.tabs(
+    ["Overview", "General Information", "Risk Analysis", "Wirkungsmatrix", "Recommended Actions", "Suggestions"]
+)
+
+# Search Functionality within Suggestion Tab
+with f_tab:
+    with st.container():
+        col1, col2 = st.columns(2)
+        with col2:
+            # Capture the input from the text input widget
+            input_search_query = st.text_input("Search:", value=st.session_state.get('search_query', ''),
+                                               key="search_query")
+
 if uploaded_file is not None:
-    # time.sleep(5)
-    query_index = create_index(filepath)
+    temp_filepath = Path("temp_file.pdf")
+    with open(temp_filepath, "wb") as f:
+        f.write(uploaded_file.read())
+    processing_container.text("File uploaded...")
+    time.sleep(2)
+    processing_container.text("Processing...")
+    display_information_once()
+    # uploaded_file = None
+else:
+    st.markdown("""<p style="color: #3ae2a5;">Please upload a PDF file.</p>""", unsafe_allow_html=True)
 
-    # data
-    overview_data = overview_report(query_index)
-    key_val_data = key_value_pairs(query_index)
-    risk_gen_data = risk_analysis(query_index)
-    wirk_data = wirkungsmatrix(filepath)
-    actions_data = next_steps(query_index)
-    fields_data = recommended_fields_generation(query_index)
+# Conditionally update the session state if the input has changed
+if 'search_query' not in st.session_state or input_search_query != st.session_state['search_query']:
+    uploaded_file = None
+    st.session_state['search_query'] = input_search_query
 
-    processing_container.markdown("""<p style="color: #3ae2a5;">Processing complete!</p>""", unsafe_allow_html=True)
-    st.markdown("Here's an analysis of your report")
-
-    # overview_tab, insights_tab, history_tab = st.tabs(["Overview", "Insights", "History"])
-    ov_tab, kv_tab, rg_tab, w_tab, ac_tab, f_tab = st.tabs(
-        ["Overview", "General Information", "Risk Analysis", "Wirkungsmatrix", "Recommended Actions", "Suggestions"]
-    )
-
-    with ov_tab:
-        st.markdown(overview_data)
-    with kv_tab:
-        st.markdown(key_val_data)
-    with rg_tab:
-        st.markdown(risk_gen_data)
-    with w_tab:
-        st.markdown(wirk_data[0])
-        st.markdown(wirk_data[1])
-        st.markdown(wirk_data[2])
-        st.markdown(wirk_data[3])
-        st.markdown(wirk_data[4])
-        st.markdown(wirk_data[5])
-    with ac_tab:
-        st.markdown(actions_data)
-    with f_tab:
-        st.markdown(fields_data)
+# Perform the search operation using the search term from session state
+if st.session_state['search_query']:
+    with col2:
+        answer_processing_container = st.empty()
+        answer_processing_container.markdown("""<p style="color: #3ae2a5;">Processing request...</p>""",
+                                             unsafe_allow_html=True)
+        filepath = "temp_file.pdf"
+        query_index = create_index(filepath)
+        answer = user_query_answer(query_index, st.session_state['search_query'])
+        if answer:
+            answer_processing_container.markdown("""<p style="color: #3ae2a5;">Found results!</p>""",
+                                                 unsafe_allow_html=True)
+            st.markdown(answer)
+        else:
+            st.markdown("No answer found for your query.")

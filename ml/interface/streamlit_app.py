@@ -50,6 +50,7 @@ def overview_report(index):
         "and everything it entails. You should cover all the sections of the documents. Make the report as"
         "large and as detailed as possible. Pay special attention to risks, indicators and on generating a"
         "comprehensive report out of all wirkungsmatrix and appendix tables available in the report."
+        "Respond in German."
     )
     qa_prompt_template = PromptTemplate(program_report_prompt)
     query_engine.update_prompts(
@@ -61,7 +62,7 @@ def overview_report(index):
         "your generated report covers all the necessary data, quantitative and qualitative to assist"
         "with decision making. You should not miss any important information, you should mention all"
         "the numbers clearly, along with this you should output a very detailed history of the document,"
-        "and everything it entails. You should cover all the sections of the documents.")
+        "and everything it entails. You should cover all the sections of the documents. Respond in German.")
     with ov_tab:
         st.markdown(overview)
     return overview
@@ -76,7 +77,9 @@ def key_value_pairs(index):
         "the document. Make use of the KURZBESCHREIBUNG table data in order to display all the key-value pairs"
         "about the report in the table. This should necessarily include the title of the report, country, "
         "theme, year, duration, budget and all other information present in the KURZBESCHREIBUNG table."
-        "Give the answer in the markdown format. Do NOT enclose this data within ``` ``` markers.")
+        "Give the answer in the markdown format. Do NOT enclose this data within ``` ``` markers. If there's"
+        "any missing field, you are allowed to use the header of the file and its content to fill it."
+        "Respond in German.")
     with kv_tab:
         st.markdown(key_value_data)
     return key_value_data
@@ -90,6 +93,7 @@ def risk_analysis(index):
         "with it. Give a comprehensive report on risk analysis of the document, necessarily listing all the reasons,"
         "any recommendations that are provided for these risks in the documents and call to actions. Pay particular "
         "attention on the key indicators mentioned in the report and if there's any risk or anomaly there."
+        "Respond in German."
     )
     with rg_tab:
         st.markdown(risk_data)
@@ -109,17 +113,17 @@ def wirkungsmatrix(file_path):
 
     wirkungsdata1 = query_engine.query(
         "Detail all the data in Wirkungsmatrix des Moduls, including Ziele, Indikatoren, Quellen, Annahmen, "
-        "Modulzielindikator, Programmzielindikator, Output, Outputindikator. in english."
+        "Modulzielindikator, Programmzielindikator, Output, Outputindikator. Respond in German."
     )
     wirkungsdata2 = query_engine.query(
         "Detail all the data in Wirkungsmatrix des"
         "Moduls including Outputs, Wesentliche Aktivitäten zu Outputs, Inputs / Geplante Instrumente, Annahmen."
-        "in english."
+        "Respond in German."
     )
     wirkungsdata3 = query_engine.query(
         "Detail all the information in Wirkungslogik für ein Modul, including the connections and flows between "
         "Programmziel und Zeithorizont, Programmzielindikator, Modulziel und Zeithorizont, Modulzielindikator,"
-        "Output and which of these factors are dependent on or affect each other. in english."
+        "Output and which of these factors are dependent on or affect each other. Respond in German."
     )
     processing_container.markdown("""<p style="color: #3ae2a5;">Halfway there...</p>""",
                                   unsafe_allow_html=True)
@@ -127,13 +131,14 @@ def wirkungsmatrix(file_path):
         "Detail all the information from Berichterstattung über die Kostenentwicklung in EUR, including "
         "Kostenzeile GIZ-Schema, Kostenschätzung laut Angebot (Planwert), Ist-Kosten kumuliert bis Berichtsstichtag, "
         "Bis zum Ende der Laufzeit verblei- bende Mittel, Erläuterung bei vorhersehbaren signifikanten Abweichungen "
-        "von der Kostenschätzung*. in english."
+        "von der Kostenschätzung*. Respond in German."
     )
     wirkungsdata5 = query_engine.query(
-        "Detail all the information from Ist-Kosten und angepasste Prognose pro Output bilat./reg. Vorhaben. in english"
+        "Detail all the information from Ist-Kosten und angepasste Prognose pro Output bilat./reg. Vorhaben. in German"
     )
     wirkungsdata6 = query_engine.query(
-        "Detail all the information from Karte mit Kennzeichnung der projektregion in english."
+        "Detail all the information from Karte mit Kennzeichnung der projektregion in english. If there's a map"
+        "involved, list all the countries the map is describing. Respond in German."
     )
     wirkungsdata = [wirkungsdata1, wirkungsdata2, wirkungsdata3, wirkungsdata4, wirkungsdata5, wirkungsdata6]
     with w_tab:
@@ -154,7 +159,7 @@ def next_steps(index):
         "List all the mentioned calls to actions and recommended steps mentioned in the document, arrange them"
         "according to highest risk and urgency, top to bottom. Apart from the recommended steps in the documents,"
         "you should also include the assumptions and risks and the actions you think should be taken in order to "
-        "make the program a success."
+        "make the program a success. Respond in German."
     )
     with ac_tab:
         st.markdown(next_steps_data)
@@ -169,7 +174,7 @@ def recommended_fields_generation(index):
         "to your manager so they can make the correct data-driven decisions on all factors, what information and fields"
         " would be the most useful to you? Make a list of all such fields and give your reasons on why it would be"
         "useful in order for you to assist in making data driven decisions and always have insights into how the"
-        "program is processing and drive it to success."
+        "program is processing and drive it to success. Respond in German."
     )
     with f_tab:
         with col1:
@@ -182,7 +187,7 @@ def user_query_answer(index, user_query):
     query_answer = query_engine.query(user_query + " Make the answer as detailed and as comprehensive as required."
                                       + " Make sure to use the documents as context to answer the question."
                                       + " If you cannot find an answer from the documents, tell the user to go through"
-                                        "the original document they uploaded")
+                                        "the original document they uploaded. Respond in German.")
     return query_answer
 
 
